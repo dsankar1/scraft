@@ -1,31 +1,46 @@
 {
-  "name": "scraft",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+    "name": "scraft",
+    "version": "2.1.1",
+    "description": "React library for JSON configured apps.",
+    "main": "lib/index.js",
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "rmdir /s /q lib && babel src --out-dir lib",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/dsankar1/scraft.git"
+    },
+    "keywords": [
+        "JSON",
+        "React",
+        "Builder"
     ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+    "author": "Daryan Sankar",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/dsankar1/scraft/issues"
+    },
+    "homepage": "https://github.com/dsankar1/scraft#readme",
+    "browserslist": "> 0.25%, not dead",
+    "dependencies": {
+        "global": "^4.4.0",
+        "react-grid-layout": "0.16.6",
+        "react-helmet": "^5.2.1",
+        "react-resize-detector": "^4.2.0",
+        "react-router-dom": "^5.0.1",
+        "yup": "^0.27.0"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.5.5",
+        "@babel/core": "^7.5.5",
+        "@babel/preset-react": "^7.0.0",
+        "eslint-config-prettier": "^6.0.0",
+        "eslint-plugin-prettier": "^3.1.0",
+        "prettier": "^1.18.2",
+        "react": "^16.8.6",
+        "react-dom": "^16.8.6",
+        "react-scripts": "3.0.1"
+    }
 }

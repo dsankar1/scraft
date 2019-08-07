@@ -1,68 +1,223 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Scraft
 
-## Available Scripts
+React library for JSON configured apps.
 
-In the project directory, you can run:
+## Features
+- Available as both a function and React Hook
+- Supports standard React components
+- Dynamic JSON configuration supports string interpolation & function composition
+- Handles page routing & layouts
+- Logs errors detected in the configuration
 
-### `npm start`
+## Installing
+Using npm:
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```bash
+$ npm install --save scraft
+```
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+Using yarn:
 
-### `npm test`
+```bash
+$ yarn add scraft
+```
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Usage
 
-### `npm run build`
+`App.js`
+```js 
+import React from 'react';
+import { useBuilder } from 'scraft';
+import { AppBar, Tabs, ColorBlock } from './components';
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+const config = readFile('./config.json');
+const components = { AppBar, Tabs, ColorBlock };
+const utils = { log: message => console.log(message) };
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+const App = props => {
+	const BuiltApp = useBuilder(config, components, utils);
+	return <BuiltApp />;
+};
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+or
 
-### `npm run eject`
+```js 
+import React from 'react';
+import { build } from 'scraft';
+import { AppBar, Tabs, ColorBlock } from './components';
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+const config = readFile('./config.json');
+const components = { AppBar, Tabs, ColorBlock };
+const utils = { log: message => console.log(message) };
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+const App = build(config, components, utils);
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+`config.json`
+```json
+{
+    "app": {
+        "containerIds": ["appBar"],
+        "routes": [
+            {
+                "path": "/",
+                "exact": true,
+                "pageId": "rootPage"
+            }
+        ]
+    },
+    "pages": [
+        {
+            "id": "rootPage",
+            "containerIds": ["pageTabs"],
+            "widgetIds": ["redBlock"],
+            "layouts": {
+                "lg": [
+                    {
+                        "i": "redBlock",
+                        "x": 0,
+                        "y": 0,
+                        "w": 12,
+                        "h": 4
+                    }
+                ]
+            }
+        }
+    ],
+    "containers": [
+        {
+            "id": "appBar",
+            "component": {
+                "type": "AppBar"
+            }
+        },
+        {
+            "id": "pageTabs",
+            "component": {
+                "type": "Tabs"
+            }
+        }
+    ],
+    "widgets": [
+        {
+            "id": "redBlock",
+            "handlers": {
+                "notifyClick": {
+                    "function": "${utils.log}",
+                    "parameters": ["Red block clicked!"]
+                }
+            },
+            "component": {
+                "type": "ColorBlock",
+                "props": {
+                    "background": "red",
+                    "onClick": "${handlers.notifyClick}"
+                }
+            }
+        }
+    ]
+}
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Configuration API
 
-## Learn More
+### App
+Configures the initial application level state, and containers. These will persist throughout the entire lifetime of the application. Routing within the application is also configured here.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+##### Schema
+```js
+object().shape({
+  initState: object(),
+  containerIds: array().of(string()),
+  routes: array().of(
+    object().shape({
+      path: string().required(),
+      pageId: string().required()
+    })
+  )
+})
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Pages
+Configures initial page level state, containers, and widgets. These will persist for as long as the page is mounted. Configuration for widget layout & grid is also available. The widget grid has 12 columns, and the following breakpoints:
 
-### Code Splitting
+- lg: >= 1200px
+- md: >= 992px 
+- sm: >= 768px
+- xs: < 768px
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+##### Schema
+```js
+object().shape({
+  id: string().required(),
+  initState: object(),
+  initLayoutMode: boolean(),
+  containerIds: array().of(string()),
+  widgetIds: array().of(string()),
+  layouts: object().shape({
+      lg: array().of(layoutSchema),
+      md: array().of(layoutSchema),
+      sm: array().of(layoutSchema),
+      xs: array().of(layoutSchema)
+  }),
+  grid: object().shape({
+      margin: array()
+          .of(number())
+          .max(2),
+      padding: array()
+          .of(number())
+          .max(2),
+      cols: object().shape({
+          lg: number(),
+          md: number(),
+          sm: number(),
+          xs: number()
+      }),
+      rowHeight: number()
+  })
+})
+```
 
-### Analyzing the Bundle Size
+#### Layout Schema
+```js
+object().shape({
+  i: string().required(),
+  x: number().required(),
+  y: number().required(),
+  w: number().required(),
+  h: number().required(),
+  minW: number(),
+  minH: number(),
+  maxW: number(),
+  maxH: number()
+})
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+### Containers & Widgets
+Containers and widgets share the same wrapper component which allows for the interpolation of their props.
+Each of these also allows for the composition of functions via the `handlers` property. Container components all receive the widgets as children so it's important to pass them down the tree like the following:
 
-### Making a Progressive Web App
+```js
+const Container = props => {
+  return <div>{props.children}</div>;
+};
+```
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+##### Schema
 
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+```js
+object().shape({
+  id: string().required(),
+  initState: object(),
+  handlers: object(),
+  onMount: string(),
+  onUnmount: string(),
+  component: object()
+      .shape({
+          type: string().required(),
+          props: object()
+      })
+      .required()
+})
+```
