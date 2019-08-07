@@ -1,11 +1,11 @@
 {
     "name": "scraft",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "description": "React library for JSON configured apps.",
     "main": "lib/index.js",
     "scripts": {
         "start": "react-scripts start",
-        "build": "rmdir /s /q lib && babel src --out-dir lib",
+        "build": "babel src/core --out-dir lib",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
@@ -25,10 +25,8 @@
     "homepage": "https://github.com/dsankar1/scraft#readme",
     "browserslist": "> 0.25%, not dead",
     "dependencies": {
-        "global": "^4.4.0",
         "react-grid-layout": "0.16.6",
         "react-helmet": "^5.2.1",
-        "react-resize-detector": "^4.2.0",
         "react-router-dom": "^5.0.1",
         "yup": "^0.27.0"
     },
