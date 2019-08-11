@@ -8,6 +8,7 @@ export const Page = ({ Container, initState, ...props }) => {
     const [state, setState] = useLegacyState(initState);
     const [layouts, setLayouts] = useState(props.layouts);
     const [editable, setEditable] = useState(props.editable);
+    const [breakpoint, setBreakpoint] = useState();
 
     const page = useMemo(
         () => ({
@@ -17,9 +18,19 @@ export const Page = ({ Container, initState, ...props }) => {
             layouts,
             setLayouts,
             editable,
-            setEditable
+            setEditable,
+            breakpoint
         }),
-        [initState, state, setState, layouts, setLayouts, editable, setEditable]
+        [
+            initState,
+            state,
+            setState,
+            layouts,
+            setLayouts,
+            editable,
+            setEditable,
+            breakpoint
+        ]
     );
 
     const data = useMemo(() => ({ ...props.data, page }), [props.data, page]);
@@ -45,6 +56,7 @@ export const Page = ({ Container, initState, ...props }) => {
                 editable={editable}
                 layouts={layouts}
                 onLayoutChange={(_, layouts) => setLayouts(layouts)}
+                onBreakpointChange={breakpoint => setBreakpoint(breakpoint)}
             >
                 {widgets}
             </Grid>
