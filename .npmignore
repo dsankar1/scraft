@@ -5,3 +5,5 @@
 .prettierrc.json
 yarn.lock
 src
+public
+node_modules
