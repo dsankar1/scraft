@@ -1,19 +1,79 @@
-import React, { memo } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
-import { build } from './core';
-import config from './config';
+import { useInterpolator } from './core';
 
-const Block = memo(({ onClick, ...style }) => {
-    console.log('updated');
-    return <div onClick={onClick} style={{ ...style, height: '100%' }} />;
-});
-const Container = ({ children, ...style }) => (
-    <div style={style}>{children}</div>
-);
-const utils = { log: (...params) => console.log(...params) };
+const utils = { log: (...params) => console.log(...params), alert: message => window.alert(message) };
 
-const App = build(config, { Block, Container }, utils);
+const test = {
+    initState: {
+        "name": "Bob",
+        clicks: 0
+    },
+    name: "${state.name}",
+    clicks: "${state.clicks}",
+    buttonLabel: "Click Me ${state.name}",
+    onButtonClick: "${funcs.onButtonClick}",
+    onNameClick: "${funcs.onNameClick}",
+    onMount: "${funcs.onMount}",
+    funcs: {
+        onMount: {
+            func: "${log}",
+            params: "Mounted"
+        },
+        onButtonClick: [
+            {
+                func: "${_.add}",
+                params: ["${state.clicks}", 1]
+            },
+            {
+                func: "${setState}",
+                params: {
+                    clicks: "${result}"
+                }      
+            }
+        ],
+        logClicks: [
+            {
+                func: "${log}",
+                params: "${state.clicks}"
+            }
+        ],
+        onNameClick: [
+            {
+                func: "${funcs.logClicks}"
+            },
+            {
+                func: "${log}",
+                params: "${state}"
+            }
+        ]
+    }
+};
+
+const App = () => {
+    const props = useInterpolator(test, utils);
+
+    React.useEffect(() => {
+        console.log('On Button Click changed');
+    }, [props.onButtonClick]);
+
+    React.useEffect(() => {
+        console.log('On Name Click changed');
+    }, [props.onNameClick]);
+
+    return (
+        <div>
+            Clicks: {props.clicks}<br />
+            <button onClick={props.onButtonClick}>
+                {props.buttonLabel}
+            </button><br/>
+            <button onClick={props.onNameClick}>
+                {props.name}
+            </button>
+        </div>
+    );
+}
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

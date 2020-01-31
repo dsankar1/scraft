@@ -1,2 +1,3 @@
-export { default as build } from './build';
-export { default as useBuilder } from './hooks/useBuilder';
+export * from './reinterpolate';
+export * from './useInterpolator';
+export * from './Interpolate';
